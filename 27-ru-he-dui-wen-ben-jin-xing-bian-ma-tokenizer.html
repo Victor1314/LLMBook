@@ -3,7 +3,7 @@
 <html lang="" >
     <head>
         <meta charset="UTF-8">
-        <title>小结 · LLM101</title>
+        <title>如何对文本进行编码？Tokenizer · LLM101</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="HonKit 6.0.3">
@@ -56,10 +56,10 @@
     <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="61-wu-ru-he-xun-lian-mo-xing.html" />
+    <link rel="next" href="28-embedding-ba-shu-zi-bian-cheng-xiang-liang.html" />
     
     
-    <link rel="prev" href="59-gptjia-gou-de-jin-jie-si-kao.html" />
+    <link rel="prev" href="26-er-shu-ju-ji.html" />
     
 
     </head>
@@ -483,7 +483,7 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="1.2.3.1" data-path="27-ru-he-dui-wen-ben-jin-xing-bian-ma-tokenizer.html">
+        <li class="chapter active" data-level="1.2.3.1" data-path="27-ru-he-dui-wen-ben-jin-xing-bian-ma-tokenizer.html">
             
                 <a href="27-ru-he-dui-wen-ben-jin-xing-bian-ma-tokenizer.html">
             
@@ -954,7 +954,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.2.5.5" data-path="60-xiao-jie.html">
+        <li class="chapter " data-level="1.2.5.5" data-path="60-xiao-jie.html">
             
                 <a href="60-xiao-jie.html">
             
@@ -1291,7 +1291,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href="." >小结</a>
+        <a href="." >如何对文本进行编码？Tokenizer</a>
     </h1>
 </div>
 
@@ -1306,7 +1306,82 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="小结">小结</h1>
+                                <h1 id="如何对文本进行编码？tokenizer">如何对文本进行编码？Tokenizer</h1>
+<p>数据处理的第一步，就是使用数字对文本进行编码。 </p>
+<p>Tokenizer，分词器，将文本划分成一个个最小单元 —词元(token),  用于模型训练。</p>
+<p>以BERT、GPT等预训练语言模型为例，tokenizer的作用流程如下：</p>
+<ol>
+<li>输入文本："I love AI."</li>
+<li>分词器处理后：["I", "love", "AI", "."]</li>
+<li>再转成ID：[101, 2001, 727, 102]（假设的ID）</li>
+<li>输入到模型中。</li>
+</ol>
+<p>词表(Vocabulary)是分词器的重要组件，将token转化成token_id。在训练前的语料处理，模型输出的解码阶段，都会用到词表。 词表重要参数就是词表大小，词表越大，能生成的语言越多。</p>
+<p>常见的分词器有BPE、wordPiece等。 BPE在大模型广泛使用，而wordPiece则是在Bert中使用。两者都属于</p>
+<p>子词分词器。</p>
+<p><strong>什么是子词？</strong></p>
+<p>子词是介于词和字符之间单元。 假如使用词作为单位来划分文本的话，颗粒度太大，词表无法兼容所有的词汇。 容易出现陌生词，也就是OOV问题(out-of-vocabulary) 。 假如使用字符来进行分词，颗粒度太小，token没有实际的含义。</p>
+<p>子词兼有两者的优点。</p>
+<p>比如： 常见英文单词的前缀和后缀，re，ful，ly。</p>
+<p><strong>BPE(byte pair encoding)算法的原理 .</strong></p>
+<p>它是如何训练，构建词表的呢？</p>
+<p>先将要训练的文本集合，按照字符来进行拆分。拆分之后，将相邻字符组合，构成子词，统计子词的频率。</p>
+<p>假设文本为，“Ｉ　love you”, 那么统计 I , Io,ov, yo, ou 的频率。</p>
+<p>将频率高的子词，确定进行合并。 </p>
+<p>再进行下一轮统计。将子词和相邻的字符或者子词合并，合并频率最高的。</p>
+<p>直到达到词表的大小。</p>
+<p><strong>wordPiece分词的原理。</strong></p>
+<p>wordPiece是子词分词算法，在Bert等语言模型之中广泛使用。wordPiece和BPE的区别在与在进行子词合并的时候，考虑了语料的概率。也就是说，在分词之后，要确常见子词的概率。而BPE中仅根据出现频率来进行考虑。出现频率高的，不一定是常见子词。</p>
+<p>假设我们有如下简单语料：</p>
+<pre><code>复制unhappiness
+unhappy
+unhappily
+unhappiest
+</code></pre><p><strong>1. BPE 的处理方式</strong></p>
+<p>BPE 会统计所有连续字符对的出现频率，比如：</p>
+<ul>
+<li>“un”、“ha”、“pp”、“in”、“es”、“ly”、“est”等等</li>
+</ul>
+<p>假设“pp”在语料中出现频率很高（比如在“happiness”、“happy”、“happily”、“happiest”里都出现了），BPE 可能会优先把“pp”合并成一个子词。</p>
+<p>但有时候，某些字符对虽然频率高，却并不是有实际意义的子词（比如“pp”本身在英文中没有独立意义）。</p>
+<p><strong>2. WordPiece 的处理方式</strong></p>
+<p>WordPiece 不仅考虑“pp”的出现频率，还会计算如果把“pp”合并成一个子词，是否能显著提升整个语料的概率（即更好地表示原始语料中的单词）。</p>
+<p>假设“un”、“happy”、“ness”、“ly”、“est”这些子词在英语中很常见，WordPiece 可能会更倾向于合并这些有实际意义的子词，而不是仅仅频率高但没意义的“pp”。</p>
+<p>比如，WordPiece 可能会优先得到如下子词：</p>
+<ul>
+<li>“un”</li>
+<li>“happy”</li>
+<li>“ness”</li>
+<li>“ly”</li>
+<li>“est”</li>
+</ul>
+<p>这样，“unhappiness”会被分成“un + happy + ness”，而不是“un + ha + pp + in + ess”。</p>
+<table>
+<thead>
+<tr>
+<th>单词</th>
+<th>BPE 分词结果</th>
+<th>WordPiece 分词结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>unhappiness</td>
+<td>un + ha + pp + in + ess</td>
+<td>un + happy + ness</td>
+</tr>
+<tr>
+<td>unhappily</td>
+<td>un + ha + pp + ily</td>
+<td>un + happy + ly</td>
+</tr>
+<tr>
+<td>unhappy</td>
+<td>un + ha + pp + y</td>
+<td>un + happy</td>
+</tr>
+</tbody>
+</table>
 
                                 
                                 </section>
@@ -1334,12 +1409,12 @@
 
             
                 
-                <a href="59-gptjia-gou-de-jin-jie-si-kao.html" class="navigation navigation-prev " aria-label="Previous page: GPT架构的进阶思考">
+                <a href="26-er-shu-ju-ji.html" class="navigation navigation-prev " aria-label="Previous page: 二、数据集">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="61-wu-ru-he-xun-lian-mo-xing.html" class="navigation navigation-next " aria-label="Next page: 五、如何训练模型">
+                <a href="28-embedding-ba-shu-zi-bian-cheng-xiang-liang.html" class="navigation navigation-next " aria-label="Next page: embedding — 把数字变成向量">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -1350,7 +1425,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"小结","level":"1.2.5.5","depth":3,"next":{"title":"五、如何训练模型","level":"1.2.6","depth":2,"path":"61-wu-ru-he-xun-lian-mo-xing.md","ref":"61-wu-ru-he-xun-lian-mo-xing.md","articles":[{"title":"如何评估模型的输出？","level":"1.2.6.1","depth":3,"path":"62-ru-he-ping-gu-mo-xing-de-shu-chu.md","ref":"62-ru-he-ping-gu-mo-xing-de-shu-chu.md","articles":[{"title":"交叉熵","level":"1.2.6.1.1","depth":4,"path":"63-jiao-cha-shang.md","ref":"63-jiao-cha-shang.md","articles":[]},{"title":"困惑度","level":"1.2.6.1.2","depth":4,"path":"64-kun-huo-du.md","ref":"64-kun-huo-du.md","articles":[]},{"title":"计算训练集和验证集的损失","level":"1.2.6.1.3","depth":4,"path":"65-ji-suan-xun-lian-ji-he-yan-zheng-ji-de-sun-shi.md","ref":"65-ji-suan-xun-lian-ji-he-yan-zheng-ji-de-sun-shi.md","articles":[]}]},{"title":"模型训练的基本流程","level":"1.2.6.2","depth":3,"path":"66-mo-xing-xun-lian-de-ji-ben-liu-cheng.md","ref":"66-mo-xing-xun-lian-de-ji-ben-liu-cheng.md","articles":[]},{"title":"高阶的训练技巧","level":"1.2.6.3","depth":3,"path":"67-gao-jie-de-xun-lian-ji-qiao.md","ref":"67-gao-jie-de-xun-lian-ji-qiao.md","articles":[]},{"title":"解码策略","level":"1.2.6.4","depth":3,"path":"68-jie-ma-ce-lue.md","ref":"68-jie-ma-ce-lue.md","articles":[]},{"title":"模型训练的的进阶思考","level":"1.2.6.5","depth":3,"path":"69-mo-xing-xun-lian-de-de-jin-jie-si-kao.md","ref":"69-mo-xing-xun-lian-de-de-jin-jie-si-kao.md","articles":[]},{"title":"小结","level":"1.2.6.6","depth":3,"path":"70-xiao-jie.md","ref":"70-xiao-jie.md","articles":[]}]},"previous":{"title":"GPT架构的进阶思考","level":"1.2.5.4","depth":3,"path":"59-gptjia-gou-de-jin-jie-si-kao.md","ref":"59-gptjia-gou-de-jin-jie-si-kao.md","articles":[]},"dir":"ltr"},"config":{"plugins":["livereload"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"LLM101","gitbook":"*"},"file":{"path":"60-xiao-jie.md","mtime":"2025-06-07T02:32:34.930Z","type":"markdown"},"gitbook":{"version":"6.0.3","time":"2025-06-07T02:34:43.968Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"如何对文本进行编码？Tokenizer","level":"1.2.3.1","depth":3,"next":{"title":"embedding — 把数字变成向量","level":"1.2.3.2","depth":3,"path":"28-embedding-ba-shu-zi-bian-cheng-xiang-liang.md","ref":"28-embedding-ba-shu-zi-bian-cheng-xiang-liang.md","articles":[]},"previous":{"title":"二、数据集","level":"1.2.3","depth":2,"path":"26-er-shu-ju-ji.md","ref":"26-er-shu-ju-ji.md","articles":[{"title":"如何对文本进行编码？Tokenizer","level":"1.2.3.1","depth":3,"path":"27-ru-he-dui-wen-ben-jin-xing-bian-ma-tokenizer.md","ref":"27-ru-he-dui-wen-ben-jin-xing-bian-ma-tokenizer.md","articles":[]},{"title":"embedding — 把数字变成向量","level":"1.2.3.2","depth":3,"path":"28-embedding-ba-shu-zi-bian-cheng-xiang-liang.md","ref":"28-embedding-ba-shu-zi-bian-cheng-xiang-liang.md","articles":[]},{"title":"如何对位置进行编码？","level":"1.2.3.3","depth":3,"path":"29-ru-he-dui-wei-zhi-jin-xing-bian-ma.md","ref":"29-ru-he-dui-wei-zhi-jin-xing-bian-ma.md","articles":[]},{"title":"构建Input- target训练对","level":"1.2.3.4","depth":3,"path":"30-gou-jian-input-targetxun-lian-dui.md","ref":"30-gou-jian-input-targetxun-lian-dui.md","articles":[]},{"title":"常见的数据集格式","level":"1.2.3.5","depth":3,"path":"31-chang-jian-de-shu-ju-ji-ge-shi.md","ref":"31-chang-jian-de-shu-ju-ji-ge-shi.md","articles":[{"title":"AIpaca","level":"1.2.3.5.1","depth":4,"path":"32-aipaca.md","ref":"32-aipaca.md","articles":[]},{"title":"ShareGPT","level":"1.2.3.5.2","depth":4,"path":"33-sharegpt.md","ref":"33-sharegpt.md","articles":[]}]},{"title":"数据集的进阶思考","level":"1.2.3.6","depth":3,"path":"34-shu-ju-ji-de-jin-jie-si-kao.md","ref":"34-shu-ju-ji-de-jin-jie-si-kao.md","articles":[]},{"title":"小结","level":"1.2.3.7","depth":3,"path":"35-xiao-jie.md","ref":"35-xiao-jie.md","articles":[]}]},"dir":"ltr"},"config":{"plugins":["livereload"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"LLM101","gitbook":"*"},"file":{"path":"27-ru-he-dui-wen-ben-jin-xing-bian-ma-tokenizer.md","mtime":"2025-06-07T02:32:34.894Z","type":"markdown"},"gitbook":{"version":"6.0.3","time":"2025-06-07T02:34:43.968Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>

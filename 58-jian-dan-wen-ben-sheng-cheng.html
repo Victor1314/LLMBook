@@ -3,7 +3,7 @@
 <html lang="" >
     <head>
         <meta charset="UTF-8">
-        <title>小结 · LLM101</title>
+        <title>简单文本生成 · LLM101</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="HonKit 6.0.3">
@@ -56,10 +56,10 @@
     <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="61-wu-ru-he-xun-lian-mo-xing.html" />
+    <link rel="next" href="59-gptjia-gou-de-jin-jie-si-kao.html" />
     
     
-    <link rel="prev" href="59-gptjia-gou-de-jin-jie-si-kao.html" />
+    <link rel="prev" href="57-gpthe-xin-you-na-xie-zu-jian.html" />
     
 
     </head>
@@ -928,7 +928,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.2.5.3" data-path="58-jian-dan-wen-ben-sheng-cheng.html">
+        <li class="chapter active" data-level="1.2.5.3" data-path="58-jian-dan-wen-ben-sheng-cheng.html">
             
                 <a href="58-jian-dan-wen-ben-sheng-cheng.html">
             
@@ -954,7 +954,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.2.5.5" data-path="60-xiao-jie.html">
+        <li class="chapter " data-level="1.2.5.5" data-path="60-xiao-jie.html">
             
                 <a href="60-xiao-jie.html">
             
@@ -1291,7 +1291,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href="." >小结</a>
+        <a href="." >简单文本生成</a>
     </h1>
 </div>
 
@@ -1306,7 +1306,49 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="小结">小结</h1>
+                                <h1 id="简单文本生成">简单文本生成</h1>
+<p>使用贪婪解码生成文本。</p>
+<pre><code class="lang-python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">generate_text_simple</span>(<span class="hljs-params">model, idx, max_new_tokens, context_size</span>):
+    <span class="hljs-comment"># idx是当前上下文中的索引数组，形状为(B, T)</span>
+    <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(max_new_tokens):
+
+        <span class="hljs-comment"># 如果当前上下文超过了支持的长度，就对当前上下文进行截断</span>
+        <span class="hljs-comment"># 例如，如果LLM只支持5个token，而上下文长度为10，</span>
+        <span class="hljs-comment"># 那么只有最后5个token会被用作上下文</span>
+
+        idx_cond = idx[:, -context_size:]
+
+        <span class="hljs-comment"># 获取预测结果</span>
+        <span class="hljs-keyword">with</span> torch.no_grad():
+            logits = model(idx_cond)
+
+        <span class="hljs-comment"># 只关注最后一个时间步</span>
+        <span class="hljs-comment"># (batch, n_token, vocab_size)变为(batch, vocab_size)</span>
+        logits = logits[:, -<span class="hljs-number">1</span>, :]  
+
+        <span class="hljs-comment"># 通过softmax函数获得对应的概率</span>
+        probas = torch.softmax(logits, dim=-<span class="hljs-number">1</span>)  <span class="hljs-comment"># (batch, vocab_size)</span>
+
+        <span class="hljs-comment"># 获取概率值最高的单词索引</span>
+        idx_next = torch.argmax(probas, dim=-<span class="hljs-number">1</span>, keepdim=<span class="hljs-literal">True</span>)  <span class="hljs-comment"># (batch, 1)</span>
+
+        <span class="hljs-comment"># 将采样到的索引添加到当前运行的上下文索引序列中</span>
+        idx = torch.cat((idx, idx_next), dim=<span class="hljs-number">1</span>)  <span class="hljs-comment"># (batch, n_tokens+1)</span>
+
+    <span class="hljs-keyword">return</span> idx
+</code></pre>
+<p>模型是如何结束输出的？ </p>
+<p>​     模型什么时候终止，受到三个因素的影响。max_sequence , max_new_token, 模型主动输出停止符 <code>eos</code> .</p>
+<p>在推理中，如果序列的长度达到了max_sequence， 模型就不会再输出。具体来说，</p>
+<p><strong>（1）如果达到max_sequence_length（最大序列长度）</strong></p>
+<ul>
+<li>这条序列<strong>不能再生成新的token</strong>，直接停止生成。</li>
+<li>在实际实现中，这条序列会被<strong>mask/pad</strong>，即后续生成步骤中，这条序列不再被“激活”，只保留已生成内容。</li>
+</ul>
+<p><strong>（2）如果提前遇到终止符（如EOS）</strong></p>
+<ul>
+<li>这条序列也会停止生成，后续步骤用padding填充。</li>
+</ul>
 
                                 
                                 </section>
@@ -1334,12 +1376,12 @@
 
             
                 
-                <a href="59-gptjia-gou-de-jin-jie-si-kao.html" class="navigation navigation-prev " aria-label="Previous page: GPT架构的进阶思考">
+                <a href="57-gpthe-xin-you-na-xie-zu-jian.html" class="navigation navigation-prev " aria-label="Previous page: GPT核心有哪些组件？">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="61-wu-ru-he-xun-lian-mo-xing.html" class="navigation navigation-next " aria-label="Next page: 五、如何训练模型">
+                <a href="59-gptjia-gou-de-jin-jie-si-kao.html" class="navigation navigation-next " aria-label="Next page: GPT架构的进阶思考">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -1350,7 +1392,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"小结","level":"1.2.5.5","depth":3,"next":{"title":"五、如何训练模型","level":"1.2.6","depth":2,"path":"61-wu-ru-he-xun-lian-mo-xing.md","ref":"61-wu-ru-he-xun-lian-mo-xing.md","articles":[{"title":"如何评估模型的输出？","level":"1.2.6.1","depth":3,"path":"62-ru-he-ping-gu-mo-xing-de-shu-chu.md","ref":"62-ru-he-ping-gu-mo-xing-de-shu-chu.md","articles":[{"title":"交叉熵","level":"1.2.6.1.1","depth":4,"path":"63-jiao-cha-shang.md","ref":"63-jiao-cha-shang.md","articles":[]},{"title":"困惑度","level":"1.2.6.1.2","depth":4,"path":"64-kun-huo-du.md","ref":"64-kun-huo-du.md","articles":[]},{"title":"计算训练集和验证集的损失","level":"1.2.6.1.3","depth":4,"path":"65-ji-suan-xun-lian-ji-he-yan-zheng-ji-de-sun-shi.md","ref":"65-ji-suan-xun-lian-ji-he-yan-zheng-ji-de-sun-shi.md","articles":[]}]},{"title":"模型训练的基本流程","level":"1.2.6.2","depth":3,"path":"66-mo-xing-xun-lian-de-ji-ben-liu-cheng.md","ref":"66-mo-xing-xun-lian-de-ji-ben-liu-cheng.md","articles":[]},{"title":"高阶的训练技巧","level":"1.2.6.3","depth":3,"path":"67-gao-jie-de-xun-lian-ji-qiao.md","ref":"67-gao-jie-de-xun-lian-ji-qiao.md","articles":[]},{"title":"解码策略","level":"1.2.6.4","depth":3,"path":"68-jie-ma-ce-lue.md","ref":"68-jie-ma-ce-lue.md","articles":[]},{"title":"模型训练的的进阶思考","level":"1.2.6.5","depth":3,"path":"69-mo-xing-xun-lian-de-de-jin-jie-si-kao.md","ref":"69-mo-xing-xun-lian-de-de-jin-jie-si-kao.md","articles":[]},{"title":"小结","level":"1.2.6.6","depth":3,"path":"70-xiao-jie.md","ref":"70-xiao-jie.md","articles":[]}]},"previous":{"title":"GPT架构的进阶思考","level":"1.2.5.4","depth":3,"path":"59-gptjia-gou-de-jin-jie-si-kao.md","ref":"59-gptjia-gou-de-jin-jie-si-kao.md","articles":[]},"dir":"ltr"},"config":{"plugins":["livereload"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"LLM101","gitbook":"*"},"file":{"path":"60-xiao-jie.md","mtime":"2025-06-07T02:32:34.930Z","type":"markdown"},"gitbook":{"version":"6.0.3","time":"2025-06-07T02:34:43.968Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"简单文本生成","level":"1.2.5.3","depth":3,"next":{"title":"GPT架构的进阶思考","level":"1.2.5.4","depth":3,"path":"59-gptjia-gou-de-jin-jie-si-kao.md","ref":"59-gptjia-gou-de-jin-jie-si-kao.md","articles":[]},"previous":{"title":"GPT核心有哪些组件？","level":"1.2.5.2.1","depth":4,"path":"57-gpthe-xin-you-na-xie-zu-jian.md","ref":"57-gpthe-xin-you-na-xie-zu-jian.md","articles":[]},"dir":"ltr"},"config":{"plugins":["livereload"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"LLM101","gitbook":"*"},"file":{"path":"58-jian-dan-wen-ben-sheng-cheng.md","mtime":"2025-06-07T02:32:34.928Z","type":"markdown"},"gitbook":{"version":"6.0.3","time":"2025-06-07T02:34:43.968Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>

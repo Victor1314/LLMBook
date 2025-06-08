@@ -3,7 +3,7 @@
 <html lang="" >
     <head>
         <meta charset="UTF-8">
-        <title>小结 · LLM101</title>
+        <title>解码策略 · LLM101</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="HonKit 6.0.3">
@@ -56,10 +56,10 @@
     <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="61-wu-ru-he-xun-lian-mo-xing.html" />
+    <link rel="next" href="69-mo-xing-xun-lian-de-de-jin-jie-si-kao.html" />
     
     
-    <link rel="prev" href="59-gptjia-gou-de-jin-jie-si-kao.html" />
+    <link rel="prev" href="67-gao-jie-de-xun-lian-ji-qiao.html" />
     
 
     </head>
@@ -954,7 +954,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.2.5.5" data-path="60-xiao-jie.html">
+        <li class="chapter " data-level="1.2.5.5" data-path="60-xiao-jie.html">
             
                 <a href="60-xiao-jie.html">
             
@@ -1070,7 +1070,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.2.6.4" data-path="68-jie-ma-ce-lue.html">
+        <li class="chapter active" data-level="1.2.6.4" data-path="68-jie-ma-ce-lue.html">
             
                 <a href="68-jie-ma-ce-lue.html">
             
@@ -1291,7 +1291,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href="." >小结</a>
+        <a href="." >解码策略</a>
     </h1>
 </div>
 
@@ -1306,7 +1306,27 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="小结">小结</h1>
+                                <h1 id="解码策略">解码策略</h1>
+<p>大模型中的温度采样和top-k是什么？</p>
+<p>温度采样是一种用于大模型解码阶段概率化的技术，能够提高生成token的多样性。</p>
+<p>大模型是通过计算词表中，每一个词的概率来预测下一个生成的词。</p>
+<p>词表中的每个词，都会对应一个概率值。</p>
+<p>每次选取概率值最高的词，被称为贪婪解码。贪婪解码输出的词比较单一。</p>
+<p>温度采样，则是按照概率值的大小，从中进行随机化抽取，选取出下一个 词。</p>
+<p>假设词表的大小为3，模型输出单词的概率为：0.6,0.2,0.2。</p>
+<p>对于相同的输入:</p>
+<p>如果时贪婪解码，每次都会选取概率值最大0.6的词输出。</p>
+<p>如果是概率化的方式，抽中0.6的概率最高，但也会随机抽到0.2的。</p>
+<p>温度采样，是对概率的分布缩放处理。</p>
+<p>还是以（0.6,0.2,0.2）为例。</p>
+<p>每个概率都会除以温度采样。</p>
+<p>当temp = 1，概率分布不变。</p>
+<p>当temp &lt; 1,  概率分布会锐化。大的概率值会更加凸显。</p>
+<p>当temp &gt; 1, 概率分布会扁平化。各个概念之间的差距会缩小。</p>
+<p>通过设置温度采样值，来调整模型输出的丰富度。当模型输出太呆板，可以将温度采样调大，就会生成更加丰富的词。</p>
+<p>top-k则决定哪些词会进行随机抽取的过程。</p>
+<p>比如top-k = 30，那么只会从概率最大的前30个词中，随机抽取。</p>
+<p>top-k能够剔除概率值极小的值，防止输出中出现无关的词。</p>
 
                                 
                                 </section>
@@ -1334,12 +1354,12 @@
 
             
                 
-                <a href="59-gptjia-gou-de-jin-jie-si-kao.html" class="navigation navigation-prev " aria-label="Previous page: GPT架构的进阶思考">
+                <a href="67-gao-jie-de-xun-lian-ji-qiao.html" class="navigation navigation-prev " aria-label="Previous page: 高阶的训练技巧">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="61-wu-ru-he-xun-lian-mo-xing.html" class="navigation navigation-next " aria-label="Next page: 五、如何训练模型">
+                <a href="69-mo-xing-xun-lian-de-de-jin-jie-si-kao.html" class="navigation navigation-next " aria-label="Next page: 模型训练的的进阶思考">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -1350,7 +1370,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"小结","level":"1.2.5.5","depth":3,"next":{"title":"五、如何训练模型","level":"1.2.6","depth":2,"path":"61-wu-ru-he-xun-lian-mo-xing.md","ref":"61-wu-ru-he-xun-lian-mo-xing.md","articles":[{"title":"如何评估模型的输出？","level":"1.2.6.1","depth":3,"path":"62-ru-he-ping-gu-mo-xing-de-shu-chu.md","ref":"62-ru-he-ping-gu-mo-xing-de-shu-chu.md","articles":[{"title":"交叉熵","level":"1.2.6.1.1","depth":4,"path":"63-jiao-cha-shang.md","ref":"63-jiao-cha-shang.md","articles":[]},{"title":"困惑度","level":"1.2.6.1.2","depth":4,"path":"64-kun-huo-du.md","ref":"64-kun-huo-du.md","articles":[]},{"title":"计算训练集和验证集的损失","level":"1.2.6.1.3","depth":4,"path":"65-ji-suan-xun-lian-ji-he-yan-zheng-ji-de-sun-shi.md","ref":"65-ji-suan-xun-lian-ji-he-yan-zheng-ji-de-sun-shi.md","articles":[]}]},{"title":"模型训练的基本流程","level":"1.2.6.2","depth":3,"path":"66-mo-xing-xun-lian-de-ji-ben-liu-cheng.md","ref":"66-mo-xing-xun-lian-de-ji-ben-liu-cheng.md","articles":[]},{"title":"高阶的训练技巧","level":"1.2.6.3","depth":3,"path":"67-gao-jie-de-xun-lian-ji-qiao.md","ref":"67-gao-jie-de-xun-lian-ji-qiao.md","articles":[]},{"title":"解码策略","level":"1.2.6.4","depth":3,"path":"68-jie-ma-ce-lue.md","ref":"68-jie-ma-ce-lue.md","articles":[]},{"title":"模型训练的的进阶思考","level":"1.2.6.5","depth":3,"path":"69-mo-xing-xun-lian-de-de-jin-jie-si-kao.md","ref":"69-mo-xing-xun-lian-de-de-jin-jie-si-kao.md","articles":[]},{"title":"小结","level":"1.2.6.6","depth":3,"path":"70-xiao-jie.md","ref":"70-xiao-jie.md","articles":[]}]},"previous":{"title":"GPT架构的进阶思考","level":"1.2.5.4","depth":3,"path":"59-gptjia-gou-de-jin-jie-si-kao.md","ref":"59-gptjia-gou-de-jin-jie-si-kao.md","articles":[]},"dir":"ltr"},"config":{"plugins":["livereload"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"LLM101","gitbook":"*"},"file":{"path":"60-xiao-jie.md","mtime":"2025-06-07T02:32:34.930Z","type":"markdown"},"gitbook":{"version":"6.0.3","time":"2025-06-07T02:34:43.968Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"解码策略","level":"1.2.6.4","depth":3,"next":{"title":"模型训练的的进阶思考","level":"1.2.6.5","depth":3,"path":"69-mo-xing-xun-lian-de-de-jin-jie-si-kao.md","ref":"69-mo-xing-xun-lian-de-de-jin-jie-si-kao.md","articles":[]},"previous":{"title":"高阶的训练技巧","level":"1.2.6.3","depth":3,"path":"67-gao-jie-de-xun-lian-ji-qiao.md","ref":"67-gao-jie-de-xun-lian-ji-qiao.md","articles":[]},"dir":"ltr"},"config":{"plugins":["livereload"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"LLM101","gitbook":"*"},"file":{"path":"68-jie-ma-ce-lue.md","mtime":"2025-06-07T02:32:34.936Z","type":"markdown"},"gitbook":{"version":"6.0.3","time":"2025-06-07T02:34:43.968Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>

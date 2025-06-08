@@ -3,7 +3,7 @@
 <html lang="" >
     <head>
         <meta charset="UTF-8">
-        <title>小结 · LLM101</title>
+        <title>自注意力机制 · LLM101</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="HonKit 6.0.3">
@@ -56,10 +56,10 @@
     <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="61-wu-ru-he-xun-lian-mo-xing.html" />
+    <link rel="next" href="39-quan-zhong-fen-shu.html" />
     
     
-    <link rel="prev" href="59-gptjia-gou-de-jin-jie-si-kao.html" />
+    <link rel="prev" href="37-wei-he-transfomerjia-gou-neng-gou-sheng-chu.html" />
     
 
     </head>
@@ -638,7 +638,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.2.4.2" data-path="38-zi-zhu-yi-li-ji-zhi.html">
+        <li class="chapter active" data-level="1.2.4.2" data-path="38-zi-zhu-yi-li-ji-zhi.html">
             
                 <a href="38-zi-zhu-yi-li-ji-zhi.html">
             
@@ -954,7 +954,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.2.5.5" data-path="60-xiao-jie.html">
+        <li class="chapter " data-level="1.2.5.5" data-path="60-xiao-jie.html">
             
                 <a href="60-xiao-jie.html">
             
@@ -1291,7 +1291,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href="." >小结</a>
+        <a href="." >自注意力机制</a>
     </h1>
 </div>
 
@@ -1306,7 +1306,23 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="小结">小结</h1>
+                                <h1 id="自注意力机制">自注意力机制</h1>
+<p>自注意力机制是什么？  </p>
+<p>自注意力机制是一种对<strong>同一序列</strong>内不同token之间的关系编码的技术，也就是能够将token和token之间的关系进行编码。</p>
+<p>通过自注意力机制，序列中的token都会得到一个上下文向量（context -vector), 用于表示序列中上下文的信息。</p>
+<p><strong>简单的自注意力机制</strong>不包含<strong>权重矩阵</strong>，仅用于演示注意力机制的简单流程。权重矩阵是模型中可训练的参数。 </p>
+<p>简单的自注意力机制的<strong>实现流程</strong>：</p>
+<p>遍历序列中的token所对应的向量值。</p>
+<p>计算当前向量和其它向量的点积，得到权重分数，权重分数经过 <code>softmax</code>函数归一化得到权重值。</p>
+<p>序列中的所有向量 * 权重数进行累加，就得到当前token对应的上下文向量。</p>
+<p>举例：</p>
+<p>序列为：”我爱阅读“</p>
+<p>对应的向量：(vector1, vetor2,vector3,vector4 )</p>
+<p>当前的token为”我“，那么会用 vector1 *  vectori （i = 1,2,3,4）得到权重分数(score1,score2,score3,score4)</p>
+<p>权重分数归一化之后得到(w1,w2,w3,w4)</p>
+<p>最终得到，”我“对应的 context_vector1 =   w1 <em>vecotr1 + w2 </em> vector2 + w3 <em> vector3 + w4</em> vector4。 </p>
+<p>在第二章根据token创建embeding的时候，仅考虑了单个toekn以及token在序列中的位置，没有考虑token之间的关系。</p>
+<p>自注意力机制弥补了这个缺点，经过自注意力机制得到的上下文向量，能更好的表示token的，让模型获得更好地输出。</p>
 
                                 
                                 </section>
@@ -1334,12 +1350,12 @@
 
             
                 
-                <a href="59-gptjia-gou-de-jin-jie-si-kao.html" class="navigation navigation-prev " aria-label="Previous page: GPT架构的进阶思考">
+                <a href="37-wei-he-transfomerjia-gou-neng-gou-sheng-chu.html" class="navigation navigation-prev " aria-label="Previous page: 为何Transfomer架构能够胜出？">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="61-wu-ru-he-xun-lian-mo-xing.html" class="navigation navigation-next " aria-label="Next page: 五、如何训练模型">
+                <a href="39-quan-zhong-fen-shu.html" class="navigation navigation-next " aria-label="Next page: 权重分数">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -1350,7 +1366,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"小结","level":"1.2.5.5","depth":3,"next":{"title":"五、如何训练模型","level":"1.2.6","depth":2,"path":"61-wu-ru-he-xun-lian-mo-xing.md","ref":"61-wu-ru-he-xun-lian-mo-xing.md","articles":[{"title":"如何评估模型的输出？","level":"1.2.6.1","depth":3,"path":"62-ru-he-ping-gu-mo-xing-de-shu-chu.md","ref":"62-ru-he-ping-gu-mo-xing-de-shu-chu.md","articles":[{"title":"交叉熵","level":"1.2.6.1.1","depth":4,"path":"63-jiao-cha-shang.md","ref":"63-jiao-cha-shang.md","articles":[]},{"title":"困惑度","level":"1.2.6.1.2","depth":4,"path":"64-kun-huo-du.md","ref":"64-kun-huo-du.md","articles":[]},{"title":"计算训练集和验证集的损失","level":"1.2.6.1.3","depth":4,"path":"65-ji-suan-xun-lian-ji-he-yan-zheng-ji-de-sun-shi.md","ref":"65-ji-suan-xun-lian-ji-he-yan-zheng-ji-de-sun-shi.md","articles":[]}]},{"title":"模型训练的基本流程","level":"1.2.6.2","depth":3,"path":"66-mo-xing-xun-lian-de-ji-ben-liu-cheng.md","ref":"66-mo-xing-xun-lian-de-ji-ben-liu-cheng.md","articles":[]},{"title":"高阶的训练技巧","level":"1.2.6.3","depth":3,"path":"67-gao-jie-de-xun-lian-ji-qiao.md","ref":"67-gao-jie-de-xun-lian-ji-qiao.md","articles":[]},{"title":"解码策略","level":"1.2.6.4","depth":3,"path":"68-jie-ma-ce-lue.md","ref":"68-jie-ma-ce-lue.md","articles":[]},{"title":"模型训练的的进阶思考","level":"1.2.6.5","depth":3,"path":"69-mo-xing-xun-lian-de-de-jin-jie-si-kao.md","ref":"69-mo-xing-xun-lian-de-de-jin-jie-si-kao.md","articles":[]},{"title":"小结","level":"1.2.6.6","depth":3,"path":"70-xiao-jie.md","ref":"70-xiao-jie.md","articles":[]}]},"previous":{"title":"GPT架构的进阶思考","level":"1.2.5.4","depth":3,"path":"59-gptjia-gou-de-jin-jie-si-kao.md","ref":"59-gptjia-gou-de-jin-jie-si-kao.md","articles":[]},"dir":"ltr"},"config":{"plugins":["livereload"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"LLM101","gitbook":"*"},"file":{"path":"60-xiao-jie.md","mtime":"2025-06-07T02:32:34.930Z","type":"markdown"},"gitbook":{"version":"6.0.3","time":"2025-06-07T02:34:43.968Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"自注意力机制","level":"1.2.4.2","depth":3,"next":{"title":"权重分数","level":"1.2.4.2.1","depth":4,"path":"39-quan-zhong-fen-shu.md","ref":"39-quan-zhong-fen-shu.md","articles":[]},"previous":{"title":"为何Transfomer架构能够胜出？","level":"1.2.4.1","depth":3,"path":"37-wei-he-transfomerjia-gou-neng-gou-sheng-chu.md","ref":"37-wei-he-transfomerjia-gou-neng-gou-sheng-chu.md","articles":[]},"articles":[{"title":"权重分数","level":"1.2.4.2.1","depth":4,"path":"39-quan-zhong-fen-shu.md","ref":"39-quan-zhong-fen-shu.md","articles":[]},{"title":"权重","level":"1.2.4.2.2","depth":4,"path":"40-quan-zhong.md","ref":"40-quan-zhong.md","articles":[]},{"title":"上下文向量","level":"1.2.4.2.3","depth":4,"path":"41-shang-xia-wen-xiang-liang.md","ref":"41-shang-xia-wen-xiang-liang.md","articles":[]},{"title":"QKV矩阵","level":"1.2.4.2.4","depth":4,"path":"42-qkvju-zhen.md","ref":"42-qkvju-zhen.md","articles":[]}],"dir":"ltr"},"config":{"plugins":["livereload"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"LLM101","gitbook":"*"},"file":{"path":"38-zi-zhu-yi-li-ji-zhi.md","mtime":"2025-06-07T02:32:34.906Z","type":"markdown"},"gitbook":{"version":"6.0.3","time":"2025-06-07T02:34:43.968Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>

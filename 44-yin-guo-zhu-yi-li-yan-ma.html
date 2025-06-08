@@ -3,7 +3,7 @@
 <html lang="" >
     <head>
         <meta charset="UTF-8">
-        <title>小结 · LLM101</title>
+        <title>因果注意力掩码 · LLM101</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="HonKit 6.0.3">
@@ -56,10 +56,10 @@
     <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="61-wu-ru-he-xun-lian-mo-xing.html" />
+    <link rel="next" href="45-dropoutji-zhi.html" />
     
     
-    <link rel="prev" href="59-gptjia-gou-de-jin-jie-si-kao.html" />
+    <link rel="prev" href="43-yin-guo-zhu-yi-li.html" />
     
 
     </head>
@@ -723,7 +723,7 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="1.2.4.3.1" data-path="44-yin-guo-zhu-yi-li-yan-ma.html">
+        <li class="chapter active" data-level="1.2.4.3.1" data-path="44-yin-guo-zhu-yi-li-yan-ma.html">
             
                 <a href="44-yin-guo-zhu-yi-li-yan-ma.html">
             
@@ -954,7 +954,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.2.5.5" data-path="60-xiao-jie.html">
+        <li class="chapter " data-level="1.2.5.5" data-path="60-xiao-jie.html">
             
                 <a href="60-xiao-jie.html">
             
@@ -1291,7 +1291,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href="." >小结</a>
+        <a href="." >因果注意力掩码</a>
     </h1>
 </div>
 
@@ -1306,8 +1306,36 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="小结">小结</h1>
-
+                                <h1 id="因果注意力掩码">因果注意力掩码</h1>
+<p>因果注意力机制是一种在自注意力机制的基础之上，增加因果注意力掩码和 <code>dropout</code>机制的注意力机制。</p>
+<p>因果注意力掩码一种剔除序列中往后的token对当前token预测影响的技术, 它能够让下一个token的预测仅基之前的token。 </p>
+<p>如何实现因果注意力？ </p>
+<p>在传统的自注意力机制中， 计算权重时，会得到一个n *n的权重W矩阵。</p>
+<p>第i行表示，第i个token对于需了中的各个token的权重。 w（i,j）表示第i个token,对于第j个token的权重分数。</p>
+<p>对权重矩阵进行对角化处理，将对角线上方的位置对置为0。 如此一来，每个token只能看到自己之前的token。</p>
+<p>对角线上方置为0之后，每一行的概率和不再为0，需重新进行 <code>softmax</code> 归一化处理。 </p>
+<p>代码实现：</p>
+<p>创建一个掩码 ：</p>
+<pre><code># 我们创建的掩码形状应该和注意力权重矩阵的形状一致，以一一对应
+block_size = attn_scores.shape[0]
+# tril 方法会创建一个下三角矩阵
+mask_simple = torch.tril(torch.ones(block_size, block_size))
+print(mask_simple)
+</code></pre><pre><code>masked_simple = attn_weights*mask_simple
+print(masked_simple)
+</code></pre><p>再次进行归一化 </p>
+<pre><code># dim = 1 表示按行求和
+row_sums = masked_simple.sum(dim=1, keepdim=True)
+masked_simple_norm = masked_simple / row_sums
+print(masked_simple_norm)
+</code></pre><p>另外一个思路是在softmax之前，用负无穷掩盖对角线以上的部分。</p>
+<pre><code>mask = torch.triu(torch.ones(block_size, block_size), diagonal=1)
+masked = attn_scores.masked_fill(mask.bool(), -torch.inf)
+print(masked)
+</code></pre><p>softmax之后，负无穷的部分，都是0 </p>
+<pre><code>attn_weights = torch.softmax(masked / keys.shape[-1]**0.5, dim=1)
+print(attn_weights)
+</code></pre>
                                 
                                 </section>
                             
@@ -1334,12 +1362,12 @@
 
             
                 
-                <a href="59-gptjia-gou-de-jin-jie-si-kao.html" class="navigation navigation-prev " aria-label="Previous page: GPT架构的进阶思考">
+                <a href="43-yin-guo-zhu-yi-li.html" class="navigation navigation-prev " aria-label="Previous page: 因果注意力">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="61-wu-ru-he-xun-lian-mo-xing.html" class="navigation navigation-next " aria-label="Next page: 五、如何训练模型">
+                <a href="45-dropoutji-zhi.html" class="navigation navigation-next " aria-label="Next page: dropout机制">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -1350,7 +1378,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"小结","level":"1.2.5.5","depth":3,"next":{"title":"五、如何训练模型","level":"1.2.6","depth":2,"path":"61-wu-ru-he-xun-lian-mo-xing.md","ref":"61-wu-ru-he-xun-lian-mo-xing.md","articles":[{"title":"如何评估模型的输出？","level":"1.2.6.1","depth":3,"path":"62-ru-he-ping-gu-mo-xing-de-shu-chu.md","ref":"62-ru-he-ping-gu-mo-xing-de-shu-chu.md","articles":[{"title":"交叉熵","level":"1.2.6.1.1","depth":4,"path":"63-jiao-cha-shang.md","ref":"63-jiao-cha-shang.md","articles":[]},{"title":"困惑度","level":"1.2.6.1.2","depth":4,"path":"64-kun-huo-du.md","ref":"64-kun-huo-du.md","articles":[]},{"title":"计算训练集和验证集的损失","level":"1.2.6.1.3","depth":4,"path":"65-ji-suan-xun-lian-ji-he-yan-zheng-ji-de-sun-shi.md","ref":"65-ji-suan-xun-lian-ji-he-yan-zheng-ji-de-sun-shi.md","articles":[]}]},{"title":"模型训练的基本流程","level":"1.2.6.2","depth":3,"path":"66-mo-xing-xun-lian-de-ji-ben-liu-cheng.md","ref":"66-mo-xing-xun-lian-de-ji-ben-liu-cheng.md","articles":[]},{"title":"高阶的训练技巧","level":"1.2.6.3","depth":3,"path":"67-gao-jie-de-xun-lian-ji-qiao.md","ref":"67-gao-jie-de-xun-lian-ji-qiao.md","articles":[]},{"title":"解码策略","level":"1.2.6.4","depth":3,"path":"68-jie-ma-ce-lue.md","ref":"68-jie-ma-ce-lue.md","articles":[]},{"title":"模型训练的的进阶思考","level":"1.2.6.5","depth":3,"path":"69-mo-xing-xun-lian-de-de-jin-jie-si-kao.md","ref":"69-mo-xing-xun-lian-de-de-jin-jie-si-kao.md","articles":[]},{"title":"小结","level":"1.2.6.6","depth":3,"path":"70-xiao-jie.md","ref":"70-xiao-jie.md","articles":[]}]},"previous":{"title":"GPT架构的进阶思考","level":"1.2.5.4","depth":3,"path":"59-gptjia-gou-de-jin-jie-si-kao.md","ref":"59-gptjia-gou-de-jin-jie-si-kao.md","articles":[]},"dir":"ltr"},"config":{"plugins":["livereload"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"LLM101","gitbook":"*"},"file":{"path":"60-xiao-jie.md","mtime":"2025-06-07T02:32:34.930Z","type":"markdown"},"gitbook":{"version":"6.0.3","time":"2025-06-07T02:34:43.968Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"因果注意力掩码","level":"1.2.4.3.1","depth":4,"next":{"title":"dropout机制","level":"1.2.4.3.2","depth":4,"path":"45-dropoutji-zhi.md","ref":"45-dropoutji-zhi.md","articles":[]},"previous":{"title":"因果注意力","level":"1.2.4.3","depth":3,"path":"43-yin-guo-zhu-yi-li.md","ref":"43-yin-guo-zhu-yi-li.md","articles":[{"title":"因果注意力掩码","level":"1.2.4.3.1","depth":4,"path":"44-yin-guo-zhu-yi-li-yan-ma.md","ref":"44-yin-guo-zhu-yi-li-yan-ma.md","articles":[]},{"title":"dropout机制","level":"1.2.4.3.2","depth":4,"path":"45-dropoutji-zhi.md","ref":"45-dropoutji-zhi.md","articles":[]}]},"dir":"ltr"},"config":{"plugins":["livereload"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"LLM101","gitbook":"*"},"file":{"path":"44-yin-guo-zhu-yi-li-yan-ma.md","mtime":"2025-06-07T02:32:34.913Z","type":"markdown"},"gitbook":{"version":"6.0.3","time":"2025-06-07T02:34:43.968Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>

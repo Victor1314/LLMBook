@@ -3,7 +3,7 @@
 <html lang="" >
     <head>
         <meta charset="UTF-8">
-        <title>小结 · LLM101</title>
+        <title>注意力机制的进阶思考 · LLM101</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="HonKit 6.0.3">
@@ -56,10 +56,10 @@
     <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="61-wu-ru-he-xun-lian-mo-xing.html" />
+    <link rel="next" href="48-xiao-jie.html" />
     
     
-    <link rel="prev" href="59-gptjia-gou-de-jin-jie-si-kao.html" />
+    <link rel="prev" href="46-duo-tou-zhu-yi-li.html" />
     
 
     </head>
@@ -767,7 +767,7 @@
             
         </li>
     
-        <li class="chapter " data-level="1.2.4.5" data-path="47-zhu-yi-li-ji-zhi-de-jin-jie-si-kao.html">
+        <li class="chapter active" data-level="1.2.4.5" data-path="47-zhu-yi-li-ji-zhi-de-jin-jie-si-kao.html">
             
                 <a href="47-zhu-yi-li-ji-zhi-de-jin-jie-si-kao.html">
             
@@ -954,7 +954,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.2.5.5" data-path="60-xiao-jie.html">
+        <li class="chapter " data-level="1.2.5.5" data-path="60-xiao-jie.html">
             
                 <a href="60-xiao-jie.html">
             
@@ -1291,7 +1291,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href="." >小结</a>
+        <a href="." >注意力机制的进阶思考</a>
     </h1>
 </div>
 
@@ -1306,7 +1306,132 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="小结">小结</h1>
+                                <h1 id="注意力机制的进阶思考">注意力机制的进阶思考</h1>
+<p><strong>元</strong></p>
+<p>本质上是XXX</p>
+<p><strong>反</strong></p>
+<p>多头注意力机制的计算量过大。  </p>
+<p><strong>空</strong></p>
+<ul>
+<li>MHA，ＭＱＡ，GQA对比:</li>
+</ul>
+<p>MHA ，多头注意力机制，transformer论文中提出。</p>
+<p>ＭＱＡ， MHA 改进版，每个头有一个Q，所有的头共享KV矩阵。</p>
+<p>GQA，　综合版，每个头有一个Q，有多组的KV。</p>
+<table>
+<thead>
+<tr>
+<th>机制</th>
+<th>Query</th>
+<th>Key/Value</th>
+<th>参数量/速度</th>
+<th>表达能力</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MHA</td>
+<td>每头独立</td>
+<td>每头独立</td>
+<td>参数最多/慢</td>
+<td>最强</td>
+</tr>
+<tr>
+<td>MQA</td>
+<td>每头独立</td>
+<td>全部头共享</td>
+<td>参数最少/最快</td>
+<td>较弱</td>
+</tr>
+<tr>
+<td>GQA</td>
+<td>每头独立</td>
+<td>每组头共享</td>
+<td>参数适中/较快</td>
+<td>适中</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>FlashAttention是什么？</li>
+</ul>
+<p>flashAttention是一种高效的注意力机制实现方式。 传统的注意力计算的方法, 需要计算QK(T)矩阵相乘，时间复杂度为O(n2), 再对大矩阵进行softmax.  flashAttention的核心为，将大矩阵分成block，以block作为核心计算矩阵乘法运算，以及归一化计算。有了flashAttention之后，可以提高计算的效率。</p>
+<pre><code>┌──────────────┐
+│   Q, K, V    │
+└─────┬────────┘
+      │
+      ▼
+┌──────────────┐
+│ 分块加载小块 │
+└─────┬────────┘
+      │
+      ▼
+┌──────────────┐
+│ 计算分数     │
+│ 边softmax    │
+│ 边加权求和   │
+└─────┬────────┘
+      │
+      ▼
+┌──────────────┐
+│ 处理下一个块 │
+└──────────────┘
+</code></pre><ul>
+<li>KVcache的原理</li>
+</ul>
+<p>大模型一次吐出一个词。在原始的transformer中，在推理的时候，需要计算重新计算历史token的KV，新的token要生成KVQ，用Q去查询历史token的KV，捕捉特征。 因此历史的KV完全可以复用 。</p>
+<p>kv-cache 的 shape 是</p>
+<p>[batch_size, n_heads, past_seq_len, head_dim]</p>
+<p>past_seq_len：历史token长度，会随着生成步数增长。 </p>
+<p>kv-cache面临内存增长的问题，目前有的办法是将模型分到不同的GPU上，或者采用量化的方式减少显存使用。</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>维度（多头）</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Q</td>
+<td>[batch, n_heads, seq_len, head_dim]</td>
+<td>当前token查询向量</td>
+</tr>
+<tr>
+<td>K</td>
+<td>[batch, n_heads, seq_len, head_dim]</td>
+<td>历史token键向量</td>
+</tr>
+<tr>
+<td>V</td>
+<td>[batch, n_heads, seq_len, head_dim]</td>
+<td>历史token值向量</td>
+</tr>
+<tr>
+<td>kv-cache K</td>
+<td>[batch, n_heads, past_seq_len, head_dim]</td>
+<td>缓存历史K</td>
+</tr>
+<tr>
+<td>kv-cache V</td>
+<td>[batch, n_heads, past_seq_len, head_dim]</td>
+<td>缓存历史V</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>VLLM的加速原理</li>
+</ul>
+<p>pageAttention 和 Continuous Batching</p>
+<p>传统的kv-cache在进行管理的时候，会分配一个大张量，张量的size为(layer, batch_size, sequence_length, heaer_count,  head_dim)</p>
+<p>sequence_length 通常会padding到同一个长度，导致显存浪费。并且分配大张量，会导致显存碎片。</p>
+<p>你猜到了吗？ pageAttention 和内存的分页管理思想一样, 不再给请求分配一个大块显存。而是给先将显存分割成较小的页，同一个请求可以横跨不同的页。多个请求的kv可以拼接在一个大张量里。这样不会造成padding浪费。</p>
+<p>当请求过来，通过<strong>页表</strong>查询历史token在那一页。</p>
+<p>pageAttention,  kv进行矩阵运算的时候，是不是要copy一份? 　并不是。</p>
+<p> 在做Attention计算时，<strong>通过高效的索引（gather/scatter）操作，把需要的kv在计算时“逻辑上拼成”一个连续矩阵</strong></p>
+<p><strong>Continuous Batching</strong>  , 能够将不同时间发起来的请求，拼接到一个batch里推理,GPU利用率更高，相应更快。</p>
+<p>也就是能动态的扩展当前batch </p>
 
                                 
                                 </section>
@@ -1334,12 +1459,12 @@
 
             
                 
-                <a href="59-gptjia-gou-de-jin-jie-si-kao.html" class="navigation navigation-prev " aria-label="Previous page: GPT架构的进阶思考">
+                <a href="46-duo-tou-zhu-yi-li.html" class="navigation navigation-prev " aria-label="Previous page: 多头注意力">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="61-wu-ru-he-xun-lian-mo-xing.html" class="navigation navigation-next " aria-label="Next page: 五、如何训练模型">
+                <a href="48-xiao-jie.html" class="navigation navigation-next " aria-label="Next page: 小结">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -1350,7 +1475,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"小结","level":"1.2.5.5","depth":3,"next":{"title":"五、如何训练模型","level":"1.2.6","depth":2,"path":"61-wu-ru-he-xun-lian-mo-xing.md","ref":"61-wu-ru-he-xun-lian-mo-xing.md","articles":[{"title":"如何评估模型的输出？","level":"1.2.6.1","depth":3,"path":"62-ru-he-ping-gu-mo-xing-de-shu-chu.md","ref":"62-ru-he-ping-gu-mo-xing-de-shu-chu.md","articles":[{"title":"交叉熵","level":"1.2.6.1.1","depth":4,"path":"63-jiao-cha-shang.md","ref":"63-jiao-cha-shang.md","articles":[]},{"title":"困惑度","level":"1.2.6.1.2","depth":4,"path":"64-kun-huo-du.md","ref":"64-kun-huo-du.md","articles":[]},{"title":"计算训练集和验证集的损失","level":"1.2.6.1.3","depth":4,"path":"65-ji-suan-xun-lian-ji-he-yan-zheng-ji-de-sun-shi.md","ref":"65-ji-suan-xun-lian-ji-he-yan-zheng-ji-de-sun-shi.md","articles":[]}]},{"title":"模型训练的基本流程","level":"1.2.6.2","depth":3,"path":"66-mo-xing-xun-lian-de-ji-ben-liu-cheng.md","ref":"66-mo-xing-xun-lian-de-ji-ben-liu-cheng.md","articles":[]},{"title":"高阶的训练技巧","level":"1.2.6.3","depth":3,"path":"67-gao-jie-de-xun-lian-ji-qiao.md","ref":"67-gao-jie-de-xun-lian-ji-qiao.md","articles":[]},{"title":"解码策略","level":"1.2.6.4","depth":3,"path":"68-jie-ma-ce-lue.md","ref":"68-jie-ma-ce-lue.md","articles":[]},{"title":"模型训练的的进阶思考","level":"1.2.6.5","depth":3,"path":"69-mo-xing-xun-lian-de-de-jin-jie-si-kao.md","ref":"69-mo-xing-xun-lian-de-de-jin-jie-si-kao.md","articles":[]},{"title":"小结","level":"1.2.6.6","depth":3,"path":"70-xiao-jie.md","ref":"70-xiao-jie.md","articles":[]}]},"previous":{"title":"GPT架构的进阶思考","level":"1.2.5.4","depth":3,"path":"59-gptjia-gou-de-jin-jie-si-kao.md","ref":"59-gptjia-gou-de-jin-jie-si-kao.md","articles":[]},"dir":"ltr"},"config":{"plugins":["livereload"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"LLM101","gitbook":"*"},"file":{"path":"60-xiao-jie.md","mtime":"2025-06-07T02:32:34.930Z","type":"markdown"},"gitbook":{"version":"6.0.3","time":"2025-06-07T02:34:43.968Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"注意力机制的进阶思考","level":"1.2.4.5","depth":3,"next":{"title":"小结","level":"1.2.4.6","depth":3,"path":"48-xiao-jie.md","ref":"48-xiao-jie.md","articles":[]},"previous":{"title":"多头注意力","level":"1.2.4.4","depth":3,"path":"46-duo-tou-zhu-yi-li.md","ref":"46-duo-tou-zhu-yi-li.md","articles":[]},"dir":"ltr"},"config":{"plugins":["livereload"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"LLM101","gitbook":"*"},"file":{"path":"47-zhu-yi-li-ji-zhi-de-jin-jie-si-kao.md","mtime":"2025-06-07T02:32:34.917Z","type":"markdown"},"gitbook":{"version":"6.0.3","time":"2025-06-07T02:34:43.968Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>

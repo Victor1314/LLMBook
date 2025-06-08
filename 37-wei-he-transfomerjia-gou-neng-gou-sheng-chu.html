@@ -3,7 +3,7 @@
 <html lang="" >
     <head>
         <meta charset="UTF-8">
-        <title>小结 · LLM101</title>
+        <title>为何Transfomer架构能够胜出？ · LLM101</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="HonKit 6.0.3">
@@ -56,10 +56,10 @@
     <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="61-wu-ru-he-xun-lian-mo-xing.html" />
+    <link rel="next" href="38-zi-zhu-yi-li-ji-zhi.html" />
     
     
-    <link rel="prev" href="59-gptjia-gou-de-jin-jie-si-kao.html" />
+    <link rel="prev" href="36-san-zi-zhu-yi-li-ji-zhi.html" />
     
 
     </head>
@@ -625,7 +625,7 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="1.2.4.1" data-path="37-wei-he-transfomerjia-gou-neng-gou-sheng-chu.html">
+        <li class="chapter active" data-level="1.2.4.1" data-path="37-wei-he-transfomerjia-gou-neng-gou-sheng-chu.html">
             
                 <a href="37-wei-he-transfomerjia-gou-neng-gou-sheng-chu.html">
             
@@ -954,7 +954,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.2.5.5" data-path="60-xiao-jie.html">
+        <li class="chapter " data-level="1.2.5.5" data-path="60-xiao-jie.html">
             
                 <a href="60-xiao-jie.html">
             
@@ -1291,7 +1291,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href="." >小结</a>
+        <a href="." >为何Transfomer架构能够胜出？</a>
     </h1>
 </div>
 
@@ -1306,7 +1306,94 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="小结">小结</h1>
+                                <h1 id="为何transfomer架构能够胜出？">为何Transfomer架构能够胜出？</h1>
+<p>先看看transformer之前的RNN和CNN. </p>
+<p>RNN和LSTM是什么 ? </p>
+<ol>
+<li>RNN（循环神经网络，Recurrent Neural Network）</li>
+</ol>
+<p><strong>基本原理</strong></p>
+<ul>
+<li>RNN是一类用于处理序列数据的神经网络。</li>
+<li>不同于传统的前馈神经网络，RNN在每个时间步都会接收当前输入和上一个时间步的“隐藏状态”作为输入，实现信息的“记忆”与传递。</li>
+</ul>
+<p><strong>优点</strong></p>
+<ul>
+<li>能处理变长的序列数据（如文本、语音、时间序列等）。</li>
+<li>结构简单，参数共享，适合序列建模。</li>
+</ul>
+<p><strong>缺点</strong></p>
+<ul>
+<li><strong>梯度消失/爆炸</strong>：长序列训练时，梯度会迅速变小或变大，导致模型难以捕捉长距离依赖关系。</li>
+<li>训练效率较低，不能并行。</li>
+</ul>
+<p>LSTM（长短期记忆网络，Long Short-Term Memory）</p>
+<p><strong>基本原理</strong></p>
+<ul>
+<li>LSTM是RNN的改进版，专门为了解决RNN的“长距离依赖”问题（即梯度消失/爆炸）。</li>
+<li>通过引入“门控机制”，控制信息的“记忆”与“遗忘”。LSTM单元包含三个门：输入门、遗忘门、输出门。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>特点</th>
+<th>RNN</th>
+<th>LSTM</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>结构</td>
+<td>简单</td>
+<td>复杂（有门控）</td>
+</tr>
+<tr>
+<td>长距离依赖</td>
+<td>容易丢失</td>
+<td>能较好捕捉</td>
+</tr>
+<tr>
+<td>参数量</td>
+<td>少</td>
+<td>多</td>
+</tr>
+<tr>
+<td>训练难度</td>
+<td>梯度消失/爆炸严重</td>
+<td>缓解梯度消失/爆炸</td>
+</tr>
+<tr>
+<td>计算速度</td>
+<td>慢（不能并行）</td>
+<td>慢（不能并行）</td>
+</tr>
+<tr>
+<td>应用</td>
+<td>简单序列建模</td>
+<td>复杂序列建模，长依赖场景</td>
+</tr>
+</tbody>
+</table>
+<p>transformer的优势在哪里？  </p>
+<ol>
+<li>并行计算能力强
+RNN/LSTM：序列数据必须按时间步依次处理，不能并行（即第t步的输出依赖于第t-1步的输出），导致训练和推理速度慢。
+Transformer：基于自注意力机制，所有位置的输入可以同时处理，实现完全并行，大幅提升训练效率。</li>
+<li>捕捉长距离依赖能力强
+RNN/LSTM：虽然LSTM通过门控机制缓解了梯度消失问题，但长距离依赖仍然难以捕捉，信息传递路径长，容易丢失上下文信息。
+Transformer：自注意力机制可以直接建立任意两个位置之间的联系，无论距离多远，捕捉长距离依赖效果更好。</li>
+<li>建模灵活
+RNN/LSTM：只能顺序建模，难以处理非顺序结构的数据。
+Transformer：通过自注意力机制，可以灵活地建模序列中任意位置之间的关系，更适合复杂结构的数据。</li>
+<li>扩展性强
+RNN/LSTM：堆叠层数受限，层数多了易出现梯度消失或爆炸。
+Transformer：结构简单，易于堆叠更深的网络层，提升模型容量和表达能力。</li>
+<li>更适合大规模数据和预训练
+Transformer结构非常适合大规模数据的分布式训练，也是BERT、GPT等预训练模型的基础结构。
+总结
+RNN/LSTM：顺序处理、依赖前后关系、捕捉长距离依赖弱、不易并行。
+Transformer：全局自注意力、并行处理、捕捉长距离依赖强、易扩展和预训练。</li>
+</ol>
 
                                 
                                 </section>
@@ -1334,12 +1421,12 @@
 
             
                 
-                <a href="59-gptjia-gou-de-jin-jie-si-kao.html" class="navigation navigation-prev " aria-label="Previous page: GPT架构的进阶思考">
+                <a href="36-san-zi-zhu-yi-li-ji-zhi.html" class="navigation navigation-prev " aria-label="Previous page: 三、自注意力机制">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="61-wu-ru-he-xun-lian-mo-xing.html" class="navigation navigation-next " aria-label="Next page: 五、如何训练模型">
+                <a href="38-zi-zhu-yi-li-ji-zhi.html" class="navigation navigation-next " aria-label="Next page: 自注意力机制">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -1350,7 +1437,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"小结","level":"1.2.5.5","depth":3,"next":{"title":"五、如何训练模型","level":"1.2.6","depth":2,"path":"61-wu-ru-he-xun-lian-mo-xing.md","ref":"61-wu-ru-he-xun-lian-mo-xing.md","articles":[{"title":"如何评估模型的输出？","level":"1.2.6.1","depth":3,"path":"62-ru-he-ping-gu-mo-xing-de-shu-chu.md","ref":"62-ru-he-ping-gu-mo-xing-de-shu-chu.md","articles":[{"title":"交叉熵","level":"1.2.6.1.1","depth":4,"path":"63-jiao-cha-shang.md","ref":"63-jiao-cha-shang.md","articles":[]},{"title":"困惑度","level":"1.2.6.1.2","depth":4,"path":"64-kun-huo-du.md","ref":"64-kun-huo-du.md","articles":[]},{"title":"计算训练集和验证集的损失","level":"1.2.6.1.3","depth":4,"path":"65-ji-suan-xun-lian-ji-he-yan-zheng-ji-de-sun-shi.md","ref":"65-ji-suan-xun-lian-ji-he-yan-zheng-ji-de-sun-shi.md","articles":[]}]},{"title":"模型训练的基本流程","level":"1.2.6.2","depth":3,"path":"66-mo-xing-xun-lian-de-ji-ben-liu-cheng.md","ref":"66-mo-xing-xun-lian-de-ji-ben-liu-cheng.md","articles":[]},{"title":"高阶的训练技巧","level":"1.2.6.3","depth":3,"path":"67-gao-jie-de-xun-lian-ji-qiao.md","ref":"67-gao-jie-de-xun-lian-ji-qiao.md","articles":[]},{"title":"解码策略","level":"1.2.6.4","depth":3,"path":"68-jie-ma-ce-lue.md","ref":"68-jie-ma-ce-lue.md","articles":[]},{"title":"模型训练的的进阶思考","level":"1.2.6.5","depth":3,"path":"69-mo-xing-xun-lian-de-de-jin-jie-si-kao.md","ref":"69-mo-xing-xun-lian-de-de-jin-jie-si-kao.md","articles":[]},{"title":"小结","level":"1.2.6.6","depth":3,"path":"70-xiao-jie.md","ref":"70-xiao-jie.md","articles":[]}]},"previous":{"title":"GPT架构的进阶思考","level":"1.2.5.4","depth":3,"path":"59-gptjia-gou-de-jin-jie-si-kao.md","ref":"59-gptjia-gou-de-jin-jie-si-kao.md","articles":[]},"dir":"ltr"},"config":{"plugins":["livereload"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"LLM101","gitbook":"*"},"file":{"path":"60-xiao-jie.md","mtime":"2025-06-07T02:32:34.930Z","type":"markdown"},"gitbook":{"version":"6.0.3","time":"2025-06-07T02:34:43.968Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"为何Transfomer架构能够胜出？","level":"1.2.4.1","depth":3,"next":{"title":"自注意力机制","level":"1.2.4.2","depth":3,"path":"38-zi-zhu-yi-li-ji-zhi.md","ref":"38-zi-zhu-yi-li-ji-zhi.md","articles":[{"title":"权重分数","level":"1.2.4.2.1","depth":4,"path":"39-quan-zhong-fen-shu.md","ref":"39-quan-zhong-fen-shu.md","articles":[]},{"title":"权重","level":"1.2.4.2.2","depth":4,"path":"40-quan-zhong.md","ref":"40-quan-zhong.md","articles":[]},{"title":"上下文向量","level":"1.2.4.2.3","depth":4,"path":"41-shang-xia-wen-xiang-liang.md","ref":"41-shang-xia-wen-xiang-liang.md","articles":[]},{"title":"QKV矩阵","level":"1.2.4.2.4","depth":4,"path":"42-qkvju-zhen.md","ref":"42-qkvju-zhen.md","articles":[]}]},"previous":{"title":"三、自注意力机制","level":"1.2.4","depth":2,"path":"36-san-zi-zhu-yi-li-ji-zhi.md","ref":"36-san-zi-zhu-yi-li-ji-zhi.md","articles":[{"title":"为何Transfomer架构能够胜出？","level":"1.2.4.1","depth":3,"path":"37-wei-he-transfomerjia-gou-neng-gou-sheng-chu.md","ref":"37-wei-he-transfomerjia-gou-neng-gou-sheng-chu.md","articles":[]},{"title":"自注意力机制","level":"1.2.4.2","depth":3,"path":"38-zi-zhu-yi-li-ji-zhi.md","ref":"38-zi-zhu-yi-li-ji-zhi.md","articles":[{"title":"权重分数","level":"1.2.4.2.1","depth":4,"path":"39-quan-zhong-fen-shu.md","ref":"39-quan-zhong-fen-shu.md","articles":[]},{"title":"权重","level":"1.2.4.2.2","depth":4,"path":"40-quan-zhong.md","ref":"40-quan-zhong.md","articles":[]},{"title":"上下文向量","level":"1.2.4.2.3","depth":4,"path":"41-shang-xia-wen-xiang-liang.md","ref":"41-shang-xia-wen-xiang-liang.md","articles":[]},{"title":"QKV矩阵","level":"1.2.4.2.4","depth":4,"path":"42-qkvju-zhen.md","ref":"42-qkvju-zhen.md","articles":[]}]},{"title":"因果注意力","level":"1.2.4.3","depth":3,"path":"43-yin-guo-zhu-yi-li.md","ref":"43-yin-guo-zhu-yi-li.md","articles":[{"title":"因果注意力掩码","level":"1.2.4.3.1","depth":4,"path":"44-yin-guo-zhu-yi-li-yan-ma.md","ref":"44-yin-guo-zhu-yi-li-yan-ma.md","articles":[]},{"title":"dropout机制","level":"1.2.4.3.2","depth":4,"path":"45-dropoutji-zhi.md","ref":"45-dropoutji-zhi.md","articles":[]}]},{"title":"多头注意力","level":"1.2.4.4","depth":3,"path":"46-duo-tou-zhu-yi-li.md","ref":"46-duo-tou-zhu-yi-li.md","articles":[]},{"title":"注意力机制的进阶思考","level":"1.2.4.5","depth":3,"path":"47-zhu-yi-li-ji-zhi-de-jin-jie-si-kao.md","ref":"47-zhu-yi-li-ji-zhi-de-jin-jie-si-kao.md","articles":[]},{"title":"小结","level":"1.2.4.6","depth":3,"path":"48-xiao-jie.md","ref":"48-xiao-jie.md","articles":[]}]},"dir":"ltr"},"config":{"plugins":["livereload"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"LLM101","gitbook":"*"},"file":{"path":"37-wei-he-transfomerjia-gou-neng-gou-sheng-chu.md","mtime":"2025-06-07T02:32:34.904Z","type":"markdown"},"gitbook":{"version":"6.0.3","time":"2025-06-07T02:34:43.968Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>

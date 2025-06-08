@@ -3,7 +3,7 @@
 <html lang="" >
     <head>
         <meta charset="UTF-8">
-        <title>小结 · LLM101</title>
+        <title>转化为HF格式 · LLM101</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="HonKit 6.0.3">
@@ -56,10 +56,10 @@
     <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
 
     
-    <link rel="next" href="61-wu-ru-he-xun-lian-mo-xing.html" />
+    <link rel="next" href="22-shang-chuan-dao-huggingface.html" />
     
     
-    <link rel="prev" href="59-gptjia-gou-de-jin-jie-si-kao.html" />
+    <link rel="prev" href="20-mo-xing-bu-shu.html" />
     
 
     </head>
@@ -394,7 +394,7 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="1.2.2.3.1" data-path="21-zhuan-hua-wei-hfge-shi.html">
+        <li class="chapter active" data-level="1.2.2.3.1" data-path="21-zhuan-hua-wei-hfge-shi.html">
             
                 <a href="21-zhuan-hua-wei-hfge-shi.html">
             
@@ -954,7 +954,7 @@
             
         </li>
     
-        <li class="chapter active" data-level="1.2.5.5" data-path="60-xiao-jie.html">
+        <li class="chapter " data-level="1.2.5.5" data-path="60-xiao-jie.html">
             
                 <a href="60-xiao-jie.html">
             
@@ -1291,7 +1291,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href="." >小结</a>
+        <a href="." >转化为HF格式</a>
     </h1>
 </div>
 
@@ -1306,7 +1306,36 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="小结">小结</h1>
+                                <h1 id="转化为hf格式">转化为HF格式</h1>
+<p>目前是的 <code>pytorch</code> 的格式,  需要先转化成 <code>HF</code>格式，才能上传到 <code>huggingface</code>。模型文件在<code>minimind\out\full_sft_512.pth</code> 。</p>
+<p>格式问题，可以参考下面这篇文章。<a href="https://mp.weixin.qq.com/s/HXMLPM2KNkO6Mah-4btaEQ" target="_blank">https://mp.weixin.qq.com/s/HXMLPM2KNkO6Mah-4btaEQ</a></p>
+<p>项目中提供了转化的脚本, 在 <code>srcipts\convert_model.py</code> 。</p>
+<p>源代码</p>
+<pre><code>if __name__ == '__main__':
+    lm_config = LMConfig(dim=512, n_layers=8, max_seq_len=8192, use_moe=False)
+
+    torch_path = f"../out/rlhf_{lm_config.dim}{'_moe' if lm_config.use_moe else ''}.pth"
+
+    transformers_path = '../MiniMind2-Small'
+
+    # convert torch to transformers model
+    convert_torch2transformers(torch_path, transformers_path)
+</code></pre><p>这里修改将 <code>stf</code> 之后的模型进行转化.<strong>请替换模型路径，修改你的模型名称</strong></p>
+<pre><code>if __name__ == '__main__':
+    lm_config = LMConfig(dim=512, n_layers=8, max_seq_len=8192, use_moe=False)
+
+   # torch_path = f"../out/rlhf_{lm_config.dim}{'_moe' if lm_config.use_moe else ''}.pth"
+
+    transformers_path = '../MiniMind-zero'  # 你想要的名称
+    torch_path = "../out/full_sft_512.pth"  # 你的.pth文件路径
+    # convert torch to transformers model
+    convert_torch2transformers(torch_path, transformers_path)
+
+    # # convert transformers to torch model
+    # convert_transformers2torch(transformers_path, torch_path)
+</code></pre><p>执行脚本之后, 在根目录下出现<code>MimiMind-zero</code>文件夹</p>
+<p><img src="https://for-note.oss-cn-shanghai.aliyuncs.com/img/image-20250322201705561.png" alt="image-20250322201705561"></img></p>
+<p><img src="https://for-note.oss-cn-shanghai.aliyuncs.com/img/image-20250327222336660.png" alt="image-20250327222336660"></img></p>
 
                                 
                                 </section>
@@ -1334,12 +1363,12 @@
 
             
                 
-                <a href="59-gptjia-gou-de-jin-jie-si-kao.html" class="navigation navigation-prev " aria-label="Previous page: GPT架构的进阶思考">
+                <a href="20-mo-xing-bu-shu.html" class="navigation navigation-prev " aria-label="Previous page: 🌐 模型部署">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
                 
-                <a href="61-wu-ru-he-xun-lian-mo-xing.html" class="navigation navigation-next " aria-label="Next page: 五、如何训练模型">
+                <a href="22-shang-chuan-dao-huggingface.html" class="navigation navigation-next " aria-label="Next page: 上传到 Huggingface">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -1350,7 +1379,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"小结","level":"1.2.5.5","depth":3,"next":{"title":"五、如何训练模型","level":"1.2.6","depth":2,"path":"61-wu-ru-he-xun-lian-mo-xing.md","ref":"61-wu-ru-he-xun-lian-mo-xing.md","articles":[{"title":"如何评估模型的输出？","level":"1.2.6.1","depth":3,"path":"62-ru-he-ping-gu-mo-xing-de-shu-chu.md","ref":"62-ru-he-ping-gu-mo-xing-de-shu-chu.md","articles":[{"title":"交叉熵","level":"1.2.6.1.1","depth":4,"path":"63-jiao-cha-shang.md","ref":"63-jiao-cha-shang.md","articles":[]},{"title":"困惑度","level":"1.2.6.1.2","depth":4,"path":"64-kun-huo-du.md","ref":"64-kun-huo-du.md","articles":[]},{"title":"计算训练集和验证集的损失","level":"1.2.6.1.3","depth":4,"path":"65-ji-suan-xun-lian-ji-he-yan-zheng-ji-de-sun-shi.md","ref":"65-ji-suan-xun-lian-ji-he-yan-zheng-ji-de-sun-shi.md","articles":[]}]},{"title":"模型训练的基本流程","level":"1.2.6.2","depth":3,"path":"66-mo-xing-xun-lian-de-ji-ben-liu-cheng.md","ref":"66-mo-xing-xun-lian-de-ji-ben-liu-cheng.md","articles":[]},{"title":"高阶的训练技巧","level":"1.2.6.3","depth":3,"path":"67-gao-jie-de-xun-lian-ji-qiao.md","ref":"67-gao-jie-de-xun-lian-ji-qiao.md","articles":[]},{"title":"解码策略","level":"1.2.6.4","depth":3,"path":"68-jie-ma-ce-lue.md","ref":"68-jie-ma-ce-lue.md","articles":[]},{"title":"模型训练的的进阶思考","level":"1.2.6.5","depth":3,"path":"69-mo-xing-xun-lian-de-de-jin-jie-si-kao.md","ref":"69-mo-xing-xun-lian-de-de-jin-jie-si-kao.md","articles":[]},{"title":"小结","level":"1.2.6.6","depth":3,"path":"70-xiao-jie.md","ref":"70-xiao-jie.md","articles":[]}]},"previous":{"title":"GPT架构的进阶思考","level":"1.2.5.4","depth":3,"path":"59-gptjia-gou-de-jin-jie-si-kao.md","ref":"59-gptjia-gou-de-jin-jie-si-kao.md","articles":[]},"dir":"ltr"},"config":{"plugins":["livereload"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"LLM101","gitbook":"*"},"file":{"path":"60-xiao-jie.md","mtime":"2025-06-07T02:32:34.930Z","type":"markdown"},"gitbook":{"version":"6.0.3","time":"2025-06-07T02:34:43.968Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"转化为HF格式","level":"1.2.2.3.1","depth":4,"next":{"title":"上传到 Huggingface","level":"1.2.2.3.2","depth":4,"path":"22-shang-chuan-dao-huggingface.md","ref":"22-shang-chuan-dao-huggingface.md","articles":[]},"previous":{"title":"🌐 模型部署","level":"1.2.2.3","depth":3,"path":"20-mo-xing-bu-shu.md","ref":"20-mo-xing-bu-shu.md","articles":[{"title":"转化为HF格式","level":"1.2.2.3.1","depth":4,"path":"21-zhuan-hua-wei-hfge-shi.md","ref":"21-zhuan-hua-wei-hfge-shi.md","articles":[]},{"title":"上传到 Huggingface","level":"1.2.2.3.2","depth":4,"path":"22-shang-chuan-dao-huggingface.md","ref":"22-shang-chuan-dao-huggingface.md","articles":[]},{"title":"创建Space，show出你的模型","level":"1.2.2.3.3","depth":4,"path":"23-chuang-jian-space-showchu-ni-de-mo-xing.md","ref":"23-chuang-jian-space-showchu-ni-de-mo-xing.md","articles":[]}]},"dir":"ltr"},"config":{"plugins":["livereload"],"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56},"embedFonts":false},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"LLM101","gitbook":"*"},"file":{"path":"21-zhuan-hua-wei-hfge-shi.md","mtime":"2025-06-07T02:32:34.888Z","type":"markdown"},"gitbook":{"version":"6.0.3","time":"2025-06-07T02:34:43.968Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>
